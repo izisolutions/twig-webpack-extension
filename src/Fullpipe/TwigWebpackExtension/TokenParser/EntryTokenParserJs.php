@@ -9,7 +9,7 @@ class EntryTokenParserJs extends EntryTokenParser
         return 'js';
     }
 
-    protected function generateHtml($entryPath, bool $defer)
+    protected function generateHtml($entryPath, bool $defer, bool $inline)
     {
         $deferHtml = $defer === true ? 'defer' : '';
         return '<script type="text/javascript" src="' . $entryPath . '" '.$deferHtml.'></script>';
