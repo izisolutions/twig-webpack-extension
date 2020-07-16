@@ -9,8 +9,12 @@ class EntryTokenParserCss extends EntryTokenParser
         return 'css';
     }
 
-    protected function generateHtml($entryPath, bool $defer)
+    protected function generateHtml($entryPath, bool $defer, bool $inline)
     {
+        if ($inline) {
+            return file_get_contents($this->publicPathInline.$entryPath);
+        }
+
         return '<link type="text/css" href="' . $entryPath . '" rel="stylesheet">';
     }
 }

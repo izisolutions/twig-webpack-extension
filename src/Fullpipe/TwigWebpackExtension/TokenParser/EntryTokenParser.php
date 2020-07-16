@@ -11,15 +11,17 @@ abstract class EntryTokenParser extends AbstractTokenParser
 {
     protected $manifestFile;
     protected $publicPath;
+    protected $publicPathInline;
 
     abstract protected function type();
 
-    abstract protected function generateHtml($entryPath, bool $defer);
+    abstract protected function generateHtml($entryPath, bool $defer, bool $inline);
 
-    public function __construct($manifestFile, $publicPath)
+    public function __construct($manifestFile, $publicPath, $publicPathInline)
     {
         $this->manifestFile = $manifestFile;
         $this->publicPath = $publicPath;
+        $this->publicPathInline = $publicPathInline;
     }
 
     public function parse(Token $token)
@@ -33,6 +35,7 @@ abstract class EntryTokenParser extends AbstractTokenParser
         $stream = $this->parser->getStream();
         $entryName = $stream->expect(Token::STRING_TYPE)->getValue();
         $defer = $stream->test(Token::STRING_TYPE) ? $stream->expect(Token::STRING_TYPE)->getValue() === 'defer' : false;
+        $inline = $stream->test(Token::STRING_TYPE) ? $stream->expect(Token::STRING_TYPE)->getValue() === 'inline' : false;
         $stream->expect(Token::BLOCK_END_TYPE);
 
         $manifest = json_decode(file_get_contents($this->manifestFile), true);
@@ -46,7 +49,7 @@ abstract class EntryTokenParser extends AbstractTokenParser
         }
 
         $entryPath = $this->publicPath . $manifest[$entryName . '.' . $this->type()];
-        $assets[] = $this->generateHtml($entryPath, $defer);
+        $assets[] = $this->generateHtml($entryPath, $defer, $inline);
         return new TextNode(implode('', $assets), $token->getLine());
     }
 
